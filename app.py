@@ -7,7 +7,7 @@ import pandas as pd
 import akshare as ak
 from datetime import datetime
 import re
-import plt
+import matplotlib.pyplot as plt
 # -----------------------------------------------------------------------------
 # 0. 指数定义
 # -----------------------------------------------------------------------------
