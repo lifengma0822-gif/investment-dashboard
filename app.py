@@ -28,7 +28,7 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
     """
     获取最新的估值、价格数据，并基于指定历史年份生成交易信号。
     """
-    st.toast(f"正在获取 {spot_code} 的最新数据...")
+    # --- 核心修正：移除了 st.toast() 调用 ---
     
     # --- 数据获取逻辑 ---
     try:
@@ -80,12 +80,11 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
 
 st.set_page_config(page_title="估值定投信号", page_icon="📈", layout="centered")
 
-# --- 核心修改点：让用户选择指数 ---
+# --- 让用户选择指数 ---
 selected_index_name = st.selectbox(
     "请选择要分析的指数:",
     options=list(INDEX_MAP.keys())
 )
-# --- 修改结束 ---
 
 # 根据用户的选择获取对应的代码
 selected_index_info = INDEX_MAP[selected_index_name]
@@ -94,6 +93,10 @@ spot_code = selected_index_info["spot_code"]
 
 # 动态更新标题
 st.title(f"📈 {selected_index_name} | 4%定投法决策辅助")
+
+# --- 核心修正：在调用缓存函数之前显示 toast ---
+st.toast(f"正在获取 {selected_index_name} 的最新数据...")
+# --- 修改结束 ---
 
 # 调用核心函数获取信号和当前价格
 signal_data, current_price = get_latest_data(valuation_code=valuation_code, spot_code=spot_code)
