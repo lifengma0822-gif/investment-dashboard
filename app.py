@@ -12,7 +12,7 @@ from datetime import datetime
 # -----------------------------------------------------------------------------
 
 @st.cache_data(ttl="1h") # 缩短缓存时间为1小时，以便更及时获取价格
-def get_latest_data(valuation_code="000300", entry_percentile=0.5, exit_percentile=0.85):
+def get_latest_data(valuation_code="沪深300", entry_percentile=0.5, exit_percentile=0.85):
     """
     获取最新的估值、价格数据，并生成交易信号。
     """
