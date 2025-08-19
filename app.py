@@ -6,6 +6,7 @@ import streamlit as st
 import pandas as pd
 import akshare as ak
 from datetime import datetime
+import re
 
 # -----------------------------------------------------------------------------
 # 0. 指数定义
@@ -45,7 +46,7 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
 
         # 2. 获取实时价格数据
         spot_df = ak.stock_zh_index_spot()
-        current_price = spot_df[spot_df['代码'] == spot_code]['最新价'].iloc[0]
+        current_price = spot_df[spot_df['代码'] ==  re.sub(r'\D', '', spot_code]['最新价'].iloc[0]
 
     except Exception as e:
         print(f"获取数据时出错: {e}")
