@@ -45,7 +45,7 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
         valuation_df = valuation_df_full[valuation_df_full.index >= ten_years_ago]
 
         # 2. 获取实时价格数据
-        spot_df = ak.stock_zh_index_spot()
+        spot_df = ak.stock_zh_index_spot_em()
         current_price = spot_df[spot_df['代码'] ==  re.sub(r'\D', '', spot_code)]['最新价'].iloc[0]
 
     except Exception as e:
