@@ -113,7 +113,7 @@ def plot_pe_history(valuation_df, price_df, index_name):
     pe_plus_1_std = pe_mean + pe_std
     pe_minus_1_std = pe_mean - pe_std
     fig, ax1 = plt.subplots(figsize=(12, 6))
-    plt.style.use('seaborn-v0_8-darkgrid')
+    plt.style.use('seaborn-v0_8-whitegrid')
     ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='P/E ratio (TTM)', zorder=10)
     ax1.axhline(pe_mean, color='grey', linestyle='--', label=f'average ({pe_mean:.2f})')
     ax1.axhline(pe_plus_1_std, color='red', linestyle='--', label=f'+1standard deviation ({pe_plus_1_std:.2f})')
