@@ -15,9 +15,8 @@ from datetime import datetime
 def get_latest_data(valuation_code="沪深300", entry_percentile=0.5, exit_percentile=0.85):
     """
     获取最新的估值、价格数据，并生成交易信号。
+    (注意：此函数已移除所有 st.toast 和 st.error 调用以修复缓存错误)
     """
-    st.toast("正在从网络获取最新数据...")
-    
     # --- 数据获取逻辑 ---
     try:
         # 1. 获取历史估值数据
@@ -32,7 +31,8 @@ def get_latest_data(valuation_code="沪深300", entry_percentile=0.5, exit_perce
         current_price = spot_df[spot_df['代码'] == f"sh{valuation_code}"]['最新价'].iloc[0]
 
     except Exception as e:
-        st.error(f"获取数据时出错: {e}")
+        # 当发生错误时，不再调用 st.error，而是直接返回 None
+        print(f"获取数据时出错: {e}") # 打印错误到日志供调试
         return None, None
     
     if valuation_df.empty:
@@ -68,7 +68,7 @@ st.title("📈 沪深300 | 4%定投法决策辅助")
 # 调用核心函数获取信号和当前价格
 signal_data, current_price = get_latest_data(valuation_code="000300")
 
-if signal_data and current_price:
+if signal_data and current_price is not None:
     signal = signal_data.get('signal', '未知')
     pe_percentile = signal_data.get('pe_percentile', 'N/A')
     date = signal_data.get('date', 'N/A')
