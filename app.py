@@ -66,7 +66,7 @@ st.set_page_config(page_title="估值定投信号", page_icon="📈", layout="ce
 st.title("📈 沪深300 | 4%定投法决策辅助")
 
 # 调用核心函数获取信号和当前价格
-signal_data, current_price = get_latest_data(valuation_code="000300")
+signal_data, current_price = get_latest_data(valuation_code="沪深300")
 
 if signal_data and current_price is not None:
     signal = signal_data.get('signal', '未知')
