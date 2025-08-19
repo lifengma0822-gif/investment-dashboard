@@ -11,8 +11,8 @@ from datetime import datetime
 # 1. 核心函数 (数据获取和信号计算)
 # -----------------------------------------------------------------------------
 
-@st.cache_data(ttl="12h") # 缩短缓存时间为1小时，以便更及时获取价格
-def get_latest_data(valuation_code="沪深300", entry_percentile=0.5, exit_percentile=0.85):
+@st.cache_data(ttl="1h") # 缩短缓存时间为1小时，以便更及时获取价格
+def get_latest_data(valuation_code="000300", entry_percentile=0.5, exit_percentile=0.85):
     """
     获取最新的估值、价格数据，并生成交易信号。
     (注意：此函数已移除所有 st.toast 和 st.error 调用以修复缓存错误)
@@ -21,7 +21,11 @@ def get_latest_data(valuation_code="沪深300", entry_percentile=0.5, exit_perce
     try:
         # 1. 获取历史估值数据
         pe_df_raw = ak.stock_index_pe_lg(symbol=valuation_code)
-        valuation_df = pe_df_raw[['日期', '滚动市盈率']]
+        
+        # --- 核心修改点：使用 .copy() 来避免 SettingWithCopyWarning ---
+        valuation_df = pe_df_raw[['日期', '滚动市盈率']].copy()
+        # --- 修改结束 ---
+        
         valuation_df.rename(columns={'日期': 'date', '滚动市盈率': 'pe'}, inplace=True)
         valuation_df['date'] = pd.to_datetime(valuation_df['date'])
         valuation_df.set_index('date', inplace=True)
