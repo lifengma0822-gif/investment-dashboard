@@ -103,6 +103,32 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
     }
     
     return result, current_price_eod, valuation_df_10y, price_df_10y, realtime_metrics
+# -----------------------------------------------------------------------------
+# 2. 绘图函数 (不变)
+# -----------------------------------------------------------------------------
+def plot_pe_history(valuation_df, price_df, index_name):
+    st.markdown(f"#### 三、{index_name} 历史估值与点位图 (近10年)")
+    pe_mean = valuation_df['pe'].mean()
+    pe_std = valuation_df['pe'].std()
+    pe_plus_1_std = pe_mean + pe_std
+    pe_minus_1_std = pe_mean - pe_std
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+    plt.style.use('seaborn-v0_8-darkgrid')
+    ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='市盈率TTM', zorder=10)
+    ax1.axhline(pe_mean, color='grey', linestyle='--', label=f'平均值 ({pe_mean:.2f})')
+    ax1.axhline(pe_plus_1_std, color='red', linestyle='--', label=f'+1标准差 ({pe_plus_1_std:.2f})')
+    ax1.axhline(pe_minus_1_std, color='green', linestyle='--', label=f'-1标准差 ({pe_minus_1_std:.2f})')
+    ax1.set_ylabel('市盈率 (PE-TTM)', color='dodgerblue', fontsize=12)
+    ax1.tick_params(axis='y', labelcolor='dodgerblue')
+    ax2 = ax1.twinx()
+    ax2.fill_between(price_df.index, price_df['close'], color='lightgrey', alpha=0.5, label='指数点位')
+    ax2.set_ylabel('指数点位', color='grey', fontsize=12)
+    ax2.tick_params(axis='y', labelcolor='grey')
+    lines, labels = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax2.legend(lines + lines2, labels + labels2, loc='upper left')
+    fig.tight_layout()
+    st.pyplot(fig)
 
 # -----------------------------------------------------------------------------
 # 2. Streamlit 网页界面布局
@@ -148,25 +174,43 @@ if signal_data and current_price is not None:
         col1.metric("实时价格", f"{realtime_metrics['realtime_price']:.2f}")
         col2.metric("估算实时PE", realtime_metrics['realtime_pe'])
         col3.metric("估算实时分位", realtime_metrics['realtime_pe_percentile'])
-    # --- 新增结束 ---
 
     # --- 第二部分：4%定投法交互式判断 ---
     if "买入" in signal:
         st.markdown("---")
         st.markdown("#### 二、4%买点精确判断")
+        
+        # --- 核心修改点 1: 增加投资金额输入框 ---
+        investment_amount = st.number_input(
+            label="请输入本次计划投入金额:",
+            min_value=0.0,
+            step=100.0,
+            format="%.2f"
+        )
+        
         last_buy_price = st.number_input(label="请输入您的上一次买入价格（如无，则输入0）:", min_value=0.0, step=10.0, format="%.2f")
         
-        # 使用实时价格进行判断（如果可用），否则使用收盘价
         price_for_decision = realtime_metrics['realtime_price'] if realtime_metrics else current_price
         st.metric(label="当前用于判断的价格", value=f"{price_for_decision:.2f}")
+
+        # --- 核心修改点 2: 在行动建议中加入份额估算 ---
+        def show_purchase_suggestion(amount, price):
+            if amount > 0 and price > 0:
+                shares_to_buy = amount / price
+                st.info(f"💡 使用 {amount:.2f} 元，大约可买入 **{shares_to_buy:.2f}** 份。")
 
         if last_buy_price > 0:
             trigger_price = last_buy_price * (1 - 0.04)
             st.info(f"下一个4%买点的触发价格为: **{trigger_price:.2f}**")
-            if price_for_decision <= trigger_price: st.success("✅ **行动建议：** 当前价格已低于触发点，**符合4%定投条件！**")
-            else: st.warning("⏳ **行动建议：** 当前价格尚未达到下一个4%买入点，请**继续等待**。")
+            if price_for_decision <= trigger_price:
+                st.success("✅ **行动建议：** 当前价格已低于触发点，**符合4%定投条件！**")
+                show_purchase_suggestion(investment_amount, price_for_decision)
+            else:
+                st.warning("⏳ **行动建议：** 当前价格尚未达到下一个4%买入点，请**继续等待**。")
         else:
             st.success("✅ **行动建议：** 当前处于估值低位，且您尚未有持仓，**符合首次买入条件！**")
+            show_purchase_suggestion(investment_amount, price_for_decision)
+        # --- 修改结束 ---
 
     # --- 第三部分：显示历史估值图表 ---
     if valuation_history is not None and price_history is not None:
