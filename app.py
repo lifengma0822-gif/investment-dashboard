@@ -126,17 +126,17 @@ def plot_valuation_history(valuation_df, price_df, stats):
     fig, ax1 = plt.subplots(figsize=(12, 6))
 
     # 绘制左轴：市盈率(PE)
-    ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='市盈率TTM', zorder=10)
-    ax1.axhline(danger_value, color='red', linestyle='--', label=f'危险值 ({danger_value:.2f})')
-    ax1.axhline(median_value, color='grey', linestyle='--', label=f'中位值 ({median_value:.2f})')
-    ax1.axhline(opportunity_value, color='green', linestyle='--', label=f'机会值 ({opportunity_value:.2f})')
-    ax1.set_ylabel('市盈率 (PE-TTM)', color='dodgerblue', fontsize=12)
+    ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='TTM', zorder=10)
+    ax1.axhline(danger_value, color='red', linestyle='--', label=f'dangerous value ({danger_value:.2f})')
+    ax1.axhline(median_value, color='grey', linestyle='--', label=f'median value ({median_value:.2f})')
+    ax1.axhline(opportunity_value, color='green', linestyle='--', label=f'opportunity value ({opportunity_value:.2f})')
+    ax1.set_ylabel('PE-TTM', color='dodgerblue', fontsize=12)
     ax1.tick_params(axis='y', labelcolor='dodgerblue')
     
     # 绘制右轴：指数点位
     ax2 = ax1.twinx()
-    ax2.fill_between(price_df.index, price_df['close'], color='lightgrey', alpha=0.5, label='指数点位')
-    ax2.set_ylabel('指数点位', color='grey', fontsize=12)
+    ax2.fill_between(price_df.index, price_df['close'], color='lightgrey', alpha=0.5, label='index point')
+    ax2.set_ylabel('index point', color='grey', fontsize=12)
     ax2.tick_params(axis='y', labelcolor='grey')
     
     # 合并图例
