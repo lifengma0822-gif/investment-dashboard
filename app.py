@@ -106,27 +106,44 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
 # -----------------------------------------------------------------------------
 # 2. 绘图函数 (不变)
 # -----------------------------------------------------------------------------
-def plot_pe_history(valuation_df, price_df, index_name):
-    st.markdown(f"#### 三、{index_name} 历史估值与点位图 (近10年)")
-    pe_mean = valuation_df['pe'].mean()
-    pe_std = valuation_df['pe'].std()
-    pe_plus_1_std = pe_mean + pe_std
-    pe_minus_1_std = pe_mean - pe_std
-    fig, ax1 = plt.subplots(figsize=(12, 6))
+def plot_pe_history(valuation_df, price_df, stats):
+    """绘制历史估值与点位图"""
+    
+    # --- 设置matplotlib以支持中文显示 ---
+    try:
+        plt.rcParams['font.sans-serif'] = ['SimHei']
+        plt.rcParams['axes.unicode_minus'] = False
+    except Exception as e:
+        print(f"设置中文字体失败: {e}")
+        st.warning("中文字体设置失败，图表中的中文可能无法正常显示。")
+
+    # --- 核心修改点：使用传入的统计值绘制分位线 ---
+    danger_value = stats['danger_value']
+    median_value = stats['median_value']
+    opportunity_value = stats['opportunity_value']
+    
     plt.style.use('seaborn-v0_8-whitegrid')
-    ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='P/E ratio (TTM)', zorder=10)
-    ax1.axhline(pe_mean, color='grey', linestyle='--', label=f'average ({pe_mean:.2f})')
-    ax1.axhline(pe_plus_1_std, color='red', linestyle='--', label=f'+1standard deviation ({pe_plus_1_std:.2f})')
-    ax1.axhline(pe_minus_1_std, color='green', linestyle='--', label=f'-1standard deviation ({pe_minus_1_std:.2f})')
-    ax1.set_ylabel('P/E ratio (PE-TTM)', color='dodgerblue', fontsize=12)
+    fig, ax1 = plt.subplots(figsize=(12, 6))
+
+    # 绘制左轴：市盈率(PE)
+    ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='市盈率TTM', zorder=10)
+    ax1.axhline(danger_value, color='red', linestyle='--', label=f'危险值 ({danger_value:.2f})')
+    ax1.axhline(median_value, color='grey', linestyle='--', label=f'中位值 ({median_value:.2f})')
+    ax1.axhline(opportunity_value, color='green', linestyle='--', label=f'机会值 ({opportunity_value:.2f})')
+    ax1.set_ylabel('市盈率 (PE-TTM)', color='dodgerblue', fontsize=12)
     ax1.tick_params(axis='y', labelcolor='dodgerblue')
+    
+    # 绘制右轴：指数点位
     ax2 = ax1.twinx()
-    ax2.fill_between(price_df.index, price_df['close'], color='lightgrey', alpha=0.5, label='Index Points')
-    ax2.set_ylabel('Index Points', color='grey', fontsize=12)
+    ax2.fill_between(price_df.index, price_df['close'], color='lightgrey', alpha=0.5, label='指数点位')
+    ax2.set_ylabel('指数点位', color='grey', fontsize=12)
     ax2.tick_params(axis='y', labelcolor='grey')
+    
+    # 合并图例
     lines, labels = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax2.legend(lines + lines2, labels + labels2, loc='upper left')
+    
     fig.tight_layout()
     st.pyplot(fig)
 
