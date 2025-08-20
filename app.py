@@ -234,7 +234,7 @@ if signal_data and current_price is not None:
         st.markdown("---")
         col1, col2 = st.columns([3, 1])
         with col1:
-            value_series = valuation_history['value']
+            value_series = valuation_history['pe']
             stats_for_plot = {
                 "danger_value": value_series.quantile(0.85),
                 "median_value": value_series.median(),
