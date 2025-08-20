@@ -106,7 +106,7 @@ def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percen
 # -----------------------------------------------------------------------------
 # 2. 绘图函数 (不变)
 # -----------------------------------------------------------------------------
-def plot_pe_history(valuation_df, price_df, stats):
+def plot_valuation_history(valuation_df, price_df, stats):
     """绘制历史估值与点位图"""
     
     # --- 设置matplotlib以支持中文显示 ---
