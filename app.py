@@ -240,7 +240,7 @@ if signal_data and current_price is not None:
                 "median_value": value_series.median(),
                 "opportunity_value": value_series.quantile(0.20),
             }
-            plot_valuation_history(valuation_history, price_history, selected_index_name, stats_for_plot)
+            plot_valuation_history(valuation_history, price_history, stats_for_plot)
         with col2:
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("##### 当前指标")
