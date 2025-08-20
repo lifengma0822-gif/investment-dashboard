@@ -232,7 +232,37 @@ if signal_data and current_price is not None:
     # --- 第三部分：显示历史估值图表 ---
     if valuation_history is not None and price_history is not None:
         st.markdown("---")
-        plot_pe_history(valuation_history, price_history, selected_index_name)
+        col1, col2 = st.columns([3, 1])
+        with col1:
+            value_series = valuation_history['value']
+            stats_for_plot = {
+                "danger_value": value_series.quantile(0.85),
+                "median_value": value_series.median(),
+                "opportunity_value": value_series.quantile(0.20),
+            }
+            plot_valuation_history(valuation_history, price_history, selected_index_name, stats_for_plot)
+        with col2:
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("##### 当前指标")
+            current_value = valuation_history['value'].iloc[-1]
+            index_level = realtime_metrics['realtime_price'] if realtime_metrics else current_price
+            st.metric("当前值", f"{current_value:.2f}")
+            st.metric("分位点", signal_data['pe_percentile'])
+            st.metric("危险值", f"{stats_for_plot['danger_value']:.2f}")
+            st.metric("中位值", f"{stats_for_plot['median_value']:.2f}")
+            st.metric("机会值", f"{stats_for_plot['opportunity_value']:.2f}")
+            st.metric("指数点位", f"{index_level:.2f}")
+            st.markdown("---")
+            st.markdown("##### 统计信息")
+            value_mean = value_series.mean()
+            value_std = value_series.std()
+            z_score = (current_value - value_mean) / value_std if value_std > 0 else 0
+            st.text(f"最大值: {value_series.max():.2f}")
+            st.text(f"平均值: {value_mean:.2f}")
+            st.text(f"最小值: {value_series.min():.2f}")
+            st.text(f"标准差(+1): {value_mean + value_std:.2f}")
+            st.text(f"标准差(-1): {value_mean - value_std:.2f}")
+            st.text(f"Z-score: {z_score:.2f}")
 
 else:
     st.error("无法加载信号数据，请稍后刷新页面重试。")
