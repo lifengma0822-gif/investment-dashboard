@@ -24,7 +24,7 @@ INDEX_MAP = {
 # 1. 核心函数 (数据获取和信号计算)
 # -----------------------------------------------------------------------------
 
-@st.cache_data(ttl="12h") # 缓存1小时
+@st.cache_data(ttl="1h") # 缓存1小时
 def get_latest_data(valuation_code, spot_code, entry_percentile=0.5, exit_percentile=0.85, history_years=10):
     """
     获取最新的估值、价格数据，并返回用于分析和绘图的历史数据及实时估值快照。
