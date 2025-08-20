@@ -127,7 +127,7 @@ def plot_valuation_history(valuation_df, price_df, stats):
 
     # 绘制左轴：市盈率(PE)
     ax1.plot(valuation_df.index, valuation_df['pe'], color='dodgerblue', label='TTM', zorder=10)
-    ax1.axhline(danger_value, color='red', linestyle='--', label=f'dangerous value ({danger_value:.2f})')
+    ax1.axhline(danger_value, color='red', linestyle='--', label=f'danger value ({danger_value:.2f})')
     ax1.axhline(median_value, color='grey', linestyle='--', label=f'median value ({median_value:.2f})')
     ax1.axhline(opportunity_value, color='green', linestyle='--', label=f'opportunity value ({opportunity_value:.2f})')
     ax1.set_ylabel('PE-TTM', color='dodgerblue', fontsize=12)
