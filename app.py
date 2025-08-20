@@ -244,7 +244,7 @@ if signal_data and current_price is not None:
         with col2:
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown("##### 当前指标")
-            current_value = valuation_history['value'].iloc[-1]
+            current_value = valuation_history['pe'].iloc[-1]
             index_level = realtime_metrics['realtime_price'] if realtime_metrics else current_price
             st.metric("当前值", f"{current_value:.2f}")
             st.metric("分位点", signal_data['pe_percentile'])
